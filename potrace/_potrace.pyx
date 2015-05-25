@@ -1,6 +1,5 @@
 cimport numpy as np
 cimport stdlib
-from python_string cimport PyString_FromString
 from potrace.bezier cimport adaptive_bezier, bezier
 
 import numpy as np
@@ -345,7 +344,7 @@ def potracelib_version():
     """
     Return the potrace library version.
     """
-    return PyString_FromString(potrace_version())
+    return potrace_version()
 
 
 # Utility functions
