@@ -4,15 +4,31 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 import numpy
+import os
 
+have_pkgconfig = False
+try:
+    import pkgconfig
+    have_pkgconfig = True
+except ImportError:
+    if os.name != 'nt':
+        print("If installing on Linux or Mac OS X, the python pkgconfig module is recommended for build.")
+
+
+if have_pkgconfig:
+    potrace_lib = pkgconfig.parse('potrace')['libraries']
+    agg_lib = pkgconfig.parse('agg')['libraries']
+else:
+    potrace_lib = ["potrace"]
+    agg_lib = ["agg"]
 
 ext_modules = [
         Extension("potrace._potrace", ["potrace/_potrace.pyx"], 
-            libraries=["potrace"], include_dirs=[numpy.get_include()]),
+            libraries=potrace_lib, include_dirs=[numpy.get_include()]),
         Extension("potrace.bezier", ["potrace/bezier.pyx"],
-            libraries=["agg"], language="c++", include_dirs=[numpy.get_include()]),
+            libraries=agg_lib, language="c++", include_dirs=[numpy.get_include()]),
         Extension("potrace.agg.curves", ["potrace/agg/curves.pyx"],
-            libraries=["agg"], language="c++"),
+            libraries=agg_lib, language="c++"),
     ]
 
 
