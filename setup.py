@@ -8,9 +8,9 @@ import numpy
 
 ext_modules = [
         Extension("potrace._potrace", ["potrace/_potrace.pyx"], 
-            libraries=["potrace"]),
+            libraries=["potrace"], include_dirs=[numpy.get_include()]),
         Extension("potrace.bezier", ["potrace/bezier.pyx"],
-            libraries=["agg"], language="c++"),
+            libraries=["agg"], language="c++", include_dirs=[numpy.get_include()]),
         Extension("potrace.agg.curves", ["potrace/agg/curves.pyx"],
             libraries=["agg"], language="c++"),
     ]
@@ -35,10 +35,9 @@ setup(
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Multimedia :: Graphics :: Graphics Conversion",
-    ],    
+    ],
 
     packages = ["potrace", "potrace.agg"],
     ext_modules = ext_modules,
-    include_dirs = [numpy.get_include()],
     cmdclass = {"build_ext": build_ext},
 )
