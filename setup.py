@@ -5,6 +5,7 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 import numpy
 import os
+import subprocess
 
 have_pkgconfig = False
 try:
@@ -15,12 +16,25 @@ except ImportError:
         print("If installing on Linux or Mac OS X, the python pkgconfig module is recommended for build.")
 
 
+# Poor version of pkgconfig package.
+def try_lib_named(pkgconfig_name, libname):
+    try:
+        libs = subprocess.check_output(['pkg-config', '--libs-only-l', pkgconfig_name]).strip().split()
+        libs_r = []
+        for i in libs:
+            i = i.decode('ascii')
+            assert i.startswith('-l')
+            libs_r.append(i[2:])
+        return libs_r
+    except subprocess.CalledProcessError:
+        return [libname]
+
 if have_pkgconfig:
     potrace_lib = pkgconfig.parse('potrace')['libraries']
     agg_lib = pkgconfig.parse('agg')['libraries']
 else:
-    potrace_lib = ["potrace"]
-    agg_lib = ["agg"]
+    agg_lib = try_lib_named('libagg', 'agg')
+    potrace_lib = try_lib_named('potrace', 'potrace')
 
 ext_modules = [
         Extension("potrace._potrace", ["potrace/_potrace.pyx"], 
